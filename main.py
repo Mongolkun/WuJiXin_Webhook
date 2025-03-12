@@ -1,6 +1,5 @@
 import os
 import asyncpg
-import re
 from contextlib import asynccontextmanager
 from http import HTTPStatus
 from dotenv import load_dotenv
@@ -25,7 +24,6 @@ bot_builder = (
     .updater(None)
     .build()
 )
-
 
 # Подключение к PostgreSQL
 async def connect_db():
@@ -75,16 +73,37 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     info_text = "\n".join([f"{row['topic']}: {row['description']}" for row in rows])
     await update.message.reply_text(info_text)
 
-async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+import html
+
+async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(f"SELECT command, response FROM {HELP_TABLE}")
-    
-    if rows:
-        help_text = "\n".join([f"<b>{row['command']}</b> – {format_text(row['response'])}" for row in rows])  # ✅ Применяем HTML-форматирование
-        await update.message.reply_text(help_text, parse_mode="HTML")
+        row = await conn.fetchrow(f"SELECT content FROM {POST_TABLE} ORDER BY RANDOM() LIMIT 1")
+
+    if row:
+        text = row['content']
+        
+import re
+
+def format_text(text):
+    text = text.replace("\n", "<br>")  # Telegram поддерживает только <br>, а не \n
+
+    # 🔹 Вариант 1: Markdown-стиль (*жирный*, _курсив_)
+    text = re.sub(r"\*(.*?)\*", r"<b>\1</b>", text)  # *Текст* → <b>Текст</b>
+    text = re.sub(r"_(.*?)_", r"<i>\1</i>", text)  # _Текст_ → <i>Текст</i>
+
+    # 🔹 Вариант 2: "ЖИРНЫЙ: текст" → <b>текст</b>
+    text = re.sub(r"ЖИРНЫЙ:\s*(.*)", r"<b>\1</b>", text)
+    text = re.sub(r"КУРСИВ:\s*(.*)", r"<i>\1</i>", text)
+
+    # 🔹 Делаем хештеги кликабельными
+    text = re.sub(r"#(\w+)", r'<a href="https://t.me/s/\1">#\1</a>', text)
+
+    return text
+
+        await update.message.reply_text(text, parse_mode="HTML")  # Отправляем в Telegram
     else:
-        await update.message.reply_text("❌ В базе пока нет команд.")
+        await update.message.reply_text("❌ В базе пока нет постов.")
 
 bot_builder.add_handler(CommandHandler("start", start))
 bot_builder.add_handler(CommandHandler("help", send_help))
