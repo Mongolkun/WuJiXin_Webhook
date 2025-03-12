@@ -50,4 +50,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Приветствие при запуске бота"""
     await update.message.reply_text("Привет! Это WuJiXing Telegram Bot 🚀")
 
+# Команда /help - получение справки
+async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pool = await connect_db()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("SELECT command, response FROM help")
+    help_text = "\\n".join([f"{row['command']}: {row['response']}" for row in rows])
+    await update.message.reply_text(help_text)
+
+
 bot_builder.add_handler(CommandHandler("start", start))
+bot_builder.add_handler(CommandHandler("help", send_help))
