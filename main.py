@@ -11,6 +11,10 @@ from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandl
 load_dotenv()
 TELEGRAM_BOT_TOKEN: str = os.getenv('TELEGRAM_BOT_TOKEN')
 WEBHOOK_DOMAIN: str = os.getenv('RAILWAY_PUBLIC_DOMAIN')
+HELP_TABLE = os.getenv("HELP_TABLE", "help")
+INFO_TABLE = os.getenv("INFO_TABLE", "info")
+POST_TABLE = os.getenv("POST_TABLE", "post")
+
 
 
 # Build the Telegram Bot application
@@ -46,18 +50,36 @@ async def process_update(request: Request):
     await bot_builder.process_update(update)
     return Response(status_code=HTTPStatus.OK)
 
-# Команда /sttart
+# Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Приветствие при запуске бота"""
     await update.message.reply_text("Привет! Это WuJiXing Telegram Bot 🚀")
 
 # Команда /help - получение справки
+
 async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
-        rows = await conn.fetch("SELECT command, response FROM help")
-    help_text = "\\n".join([f"{row['command']}: {row['response']}" for row in rows])
+        rows = await conn.fetch(f"SELECT command, response FROM {HELP_TABLE}")
+    help_text = "\n".join([f"{row['command']}: {row['response']}" for row in rows])
     await update.message.reply_text(help_text)
+
+async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pool = await connect_db()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(f"SELECT topic, description FROM {INFO_TABLE}")
+    info_text = "\n".join([f"{row['topic']}: {row['description']}" for row in rows])
+    await update.message.reply_text(info_text)
+
+async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pool = await connect_db()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(f"SELECT content FROM {POST_TABLE} ORDER BY RANDOM() LIMIT 1")
+    if row:
+        await update.message.reply_text(row['content'])
+    else:
+        await update.message.reply_text("В базе пока нет постов.")
+
 
 async def get_db_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
@@ -75,5 +97,7 @@ async def check_env(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 bot_builder.add_handler(CommandHandler("start", start))
 bot_builder.add_handler(CommandHandler("help", send_help))
+bot_builder.add_handler(CommandHandler("info", send_info))
+bot_builder.add_handler(CommandHandler("random", send_random_post))
 bot_builder.add_handler(CommandHandler("db_name", get_db_name))
 bot_builder.add_handler(CommandHandler("check_env", check_env))
