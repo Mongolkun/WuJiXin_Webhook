@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandler, filters
+from commands import register_handlers  # Импорт обработчиков команд
 
 # Load environment variables
 load_dotenv()
@@ -19,6 +20,8 @@ bot_builder = (
     .build()
 )
 
+# Регистрируем обработчики команд
+register_handlers(bot_builder)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -32,24 +35,13 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
 @app.post("/")
 async def process_update(request: Request):
     """ Handles incoming Telegram updates and processes them with the bot. """
     message = await request.json()
     update = Update.de_json(data=message, bot=bot_builder.bot)
-    await bot_builder.process_update(update)
+    await bot_builder.process_update(update)  # Теперь все команды идут в commands.py
     return Response(status_code=HTTPStatus.OK)
-
-
-async def start(update: Update, _: ContextTypes.DEFAULT_TYPE):
-    """ Handles the /start command by sending a "Hello world!" message in response. """
-    await update.message.reply_text("Hello! 🍡 Send me a message and I'll echo it back to you")
-
-
-async def echo(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    await update.message.reply_text(update.message.text)
 
 
 bot_builder.add_handler(CommandHandler(command="start", callback=start))
