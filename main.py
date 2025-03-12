@@ -61,9 +61,11 @@ async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         rows = await conn.fetch(f"SELECT command, response FROM {HELP_TABLE}")
-    help_text = "\n".join([f"{row['command']}: {row['response']}" for row in rows])
-    await update.message.reply_text(help_text)
-
+    if rows:
+        help_text = "\n".join([f"{row['command']}: {row['response']}" for row in rows])
+        await update.message.reply_text(help_text)
+    else:
+        await update.message.reply_text("❌ В базе пока нет команд.")
 async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
@@ -79,20 +81,6 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(row['content'])
     else:
         await update.message.reply_text("В базе пока нет постов.")
-
-
-async def get_db_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pool = await connect_db()
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT current_database();")  # Получаем название базы
-    await update.message.reply_text(f"База данных: {row['current_database']}")
-
-async def check_env(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Проверка, видит ли бот переменные окружения"""
-    db_url = os.getenv("DATABASE_URL", "❌ DATABASE_URL не найден")
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "❌ TEGRAM_BOT_TOKEN не найден")
-    
-    await update.message.reply_text(f"DATABASE_URL: {db_url}\nTOKEN: {bot_token}")
 
 
 bot_builder.add_handler(CommandHandler("start", start))
