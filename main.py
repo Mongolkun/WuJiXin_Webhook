@@ -66,6 +66,6 @@ async def get_db_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(f"База данных: {row['current_database']}")
 
 
-application.add_handler(CommandHandler("start", start))
-application.add_handler(CommandHandler("help", send_help))
-application.add_handler(CommandHandler("db_name", get_db_name))
+bot_builder.add_handler(CommandHandler("start", start))
+bot_builder.add_handler(CommandHandler("help", send_help))
+bot_builder.add_handler(CommandHandler("db_name", get_db_name))
