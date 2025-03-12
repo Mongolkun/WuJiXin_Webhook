@@ -43,7 +43,3 @@ async def process_update(request: Request):
     update = Update.de_json(data=message, bot=bot_builder.bot)
     await bot_builder.process_update(update)  # Теперь все команды идут в commands.py
     return Response(status_code=HTTPStatus.OK)
-
-
-bot_builder.add_handler(CommandHandler(command="start", callback=start))
-bot_builder.add_handler(MessageHandler(filters=filters.TEXT & ~filters.COMMAND, callback=echo))
