@@ -75,18 +75,6 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     info_text = "\n".join([f"{row['topic']}: {row['description']}" for row in rows])
     await update.message.reply_text(info_text)
 
-def format_text(text):
-    text = text.replace("\n", "<br>")  # Telegram использует только <br>
-
-    # 🔹 Markdown-стиль (*жирный*, _курсив_)
-    text = re.sub(r"\*(.*?)\*", r"<b>\1</b>", text)  # *Текст* → <b>Текст</b>
-    text = re.sub(r"_(.*?)_", r"<i>\1</i>", text)  # _Текст_ → <i>Текст</i>
-
-    # 🔹 Хештеги становятся кликабельными
-    text = re.sub(r"#(\w+)", r'<a href="https://t.me/s/\1">#\1</a>', text)
-
-    return text
-
 async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
