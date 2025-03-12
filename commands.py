@@ -23,8 +23,8 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     info_text = "\\n".join([f"{row['topic']}: {row['description']}" for row in rows])
     await update.message.reply_text(info_text)
 
-# Команда /random - получение случайного поста
-async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# Команда /post - получение случайного поста
+async def send_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT content FROM post ORDER BY RANDOM() LIMIT 1")
@@ -37,4 +37,4 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def register_handlers(application: Application):
     application.add_handler(CommandHandler("help", send_help))
     application.add_handler(CommandHandler("info", send_info))
-    application.add_handler(CommandHandler("random", send_random_post))
+    application.add_handler(CommandHandler("post", send_post))
