@@ -80,8 +80,8 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         row = await conn.fetchrow(f"SELECT content FROM {POST_TABLE} ORDER BY RANDOM() LIMIT 1")
 
     if row:
-        text = row['content']
-        await update.message.reply_text(text, parse_mode="HTML")  # ✅ HTML формат
+        text = row['content'].replace("\n", "<br>")  # ✅ Заменяем переносы строк на HTML
+        await update.message.reply_text(text, parse_mode="HTML")
     else:
         await update.message.reply_text("❌ В базе пока нет постов.")
 
