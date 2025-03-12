@@ -66,6 +66,7 @@ async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(help_text)
     else:
         await update.message.reply_text("❌ В базе пока нет команд.")
+        
 async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
