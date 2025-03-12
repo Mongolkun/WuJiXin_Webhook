@@ -73,15 +73,17 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rows = await conn.fetch(f"SELECT topic, description FROM {INFO_TABLE}")
     info_text = "\n".join([f"{row['topic']}: {row['description']}" for row in rows])
     await update.message.reply_text(info_text)
-
+    
 async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(f"SELECT content FROM {POST_TABLE} ORDER BY RANDOM() LIMIT 1")
+
     if row:
-        await update.message.reply_text(row['content'])
+        text = row['content']
+        await update.message.reply_text(text, parse_mode="HTML")  # ✅ HTML формат
     else:
-        await update.message.reply_text("В базе пока нет постов.")
+        await update.message.reply_text("❌ В базе пока нет постов.")
 
 
 bot_builder.add_handler(CommandHandler("start", start))
