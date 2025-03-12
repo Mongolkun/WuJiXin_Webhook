@@ -7,6 +7,11 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 async def connect_db():
     return await asyncpg.create_pool(os.getenv("DATABASE_URL"))
 
+# Команда /sttart
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Приветствие при запуске бота"""
+    await update.message.reply_text("Привет! Это WuJiXing Telegram Bot 🚀")
+
 # Команда /help - получение справки
 async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
@@ -23,8 +28,8 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     info_text = "\\n".join([f"{row['topic']}: {row['description']}" for row in rows])
     await update.message.reply_text(info_text)
 
-# Команда /post - получение случайного поста
-async def send_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# Команда /random - получение случайного поста
+async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT content FROM post ORDER BY RANDOM() LIMIT 1")
@@ -35,6 +40,7 @@ async def send_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Регистрация команд в Telegram боте
 def register_handlers(application: Application):
+    application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", send_help))
     application.add_handler(CommandHandler("info", send_info))
-    application.add_handler(CommandHandler("post", send_post))
+    application.add_handler(CommandHandler("random", send_random_post))
