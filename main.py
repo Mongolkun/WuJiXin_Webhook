@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandler, filters
-from commands import register_handlers  # Импорт обработчиков команд
+# Импорт обработчиков команд
+from commands import register_handlers
 
 # Load environment variables
 load_dotenv()
