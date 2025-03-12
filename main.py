@@ -65,7 +65,15 @@ async def get_db_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
         row = await conn.fetchrow("SELECT current_database();")  # Получаем название базы
     await update.message.reply_text(f"База данных: {row['current_database']}")
 
+async def check_env(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Проверка, видит ли бот переменные окружения"""
+    db_url = os.getenv("DATABASE_URL", "❌ DATABASE_URL не найден")
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "❌ TEGRAM_BOT_TOKEN не найден")
+    
+    await update.message.reply_text(f"DATABASE_URL: {db_url}\nTOKEN: {bot_token}")
+
 
 bot_builder.add_handler(CommandHandler("start", start))
 bot_builder.add_handler(CommandHandler("help", send_help))
 bot_builder.add_handler(CommandHandler("db_name", get_db_name))
+bot_builder.add_handler(CommandHandler("check_env", check_env))
