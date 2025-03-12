@@ -1,4 +1,5 @@
 import os
+import asyncpg
 from contextlib import asynccontextmanager
 from http import HTTPStatus
 from dotenv import load_dotenv
@@ -58,6 +59,13 @@ async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = "\\n".join([f"{row['command']}: {row['response']}" for row in rows])
     await update.message.reply_text(help_text)
 
+async def get_db_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pool = await connect_db()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT current_database();")  # Получаем название базы
+    await update.message.reply_text(f"База данных: {row['current_database']}")
 
-bot_builder.add_handler(CommandHandler("start", start))
-bot_builder.add_handler(CommandHandler("help", send_help))
+
+application.add_handler(CommandHandler("start", start))
+application.add_handler(CommandHandler("help", send_help))
+application.add_handler(CommandHandler("db_name", get_db_name))
