@@ -82,7 +82,7 @@ def markdown_to_html(text):
     # ✅ Исправленный код для ссылок [Текст](https://example.com) → <a href="URL">Текст</a>
     text = re.sub(r"(.*?)(https?://[^\s]+)", r'<a href="\2">>\1></a>', text)  
 
-    text = text.replace("|", "<br>")  # Telegram использует <br> вместо |
+    text = text.replace("|", "\n")  # Telegram использует \n вместо |
 
     return text
 
