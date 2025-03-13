@@ -80,7 +80,7 @@ def markdown_to_html(text):
     text = re.sub(r"\*(.*?)\*", r"<i>\1</i>", text)  # *Курсив* → <i>Курсив</i>
 
     # ✅ Исправленный код для ссылок [Текст](https://example.com) → <a href="URL">Текст</a>
-    text = re.sub(r"[.*?](.*?)", r'<a href="\g<2>">\g<1></a>', text)  
+    text = re.sub(r"[.*?](htpps?://[^\s]+)", r'<a href="\2>">\1></a>', text)  
 
     text = text.replace("|", "<br>")  # Telegram использует <br> вместо |
 
