@@ -92,14 +92,14 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(info_text)
 
 async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Выбираем случайный пост, форматируем и отправляем в Telegram"""
     pool = await connect_db()
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT content FROM {POST_TABLE} ORDER BY RANDOM() LIMIT 1")
+        row = await conn.fetchrow(f"SELECT content FROM posts WHERE lang = 'ru' ORDER BY RANDOM() LIMIT 1")
 
     if row:
-        text = row['content']
-        print(f"📜 Текст из базы: {text}")  # Логируем, что реально пришло
-        await update.message.reply_text(text, parse_mode="HTML")  # Отправляем как есть
+        text = markdown_to_html(row['content'])  # ✅ Конвертируем MarkdownV2 → HTML
+        await update.message.reply_text(text, parse_mode="HTML")  # ✅ Telegram поймёт формат
     else:
         await update.message.reply_text("❌ В базе пока нет постов.")
 
