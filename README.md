@@ -1,28 +1,59 @@
-# Telegram Bot with Webhooks Template
+# WuJiXing Telegram Bot 🚀
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 ![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
-![PyCharm](https://img.shields.io/badge/pycharm-143?style=for-the-badge&logo=pycharm&logoColor=black&color=black&labelColor=green)
+![Railway](https://img.shields.io/badge/Deployed-Railway-blue?style=for-the-badge&logo=railway)
 
-This template provides a basic framework for creating a Telegram bot using FastAPI, connecting it to Telegram's Webhook
-system.
+---
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/5kprwG?referralCode=Al2B-n)
+## 📌 Описание
+**WuJiXing Bot** — это Telegram-бот, который обрабатывает MarkdownV2 и HTML, генерирует случайные цитаты и поддерживает форматирование текста.  
 
-## ✨ Features
+Бот разрабатывается для проекта **WuJiXing** и поддерживает ссылки, жирный и курсивный текст.  
 
-- **FastAPI**: Lightweight, fast web framework for building APIs.
-- **[Python Telegram Bot](https://python-telegram-bot.org/)**: Seamless integration with Telegram's Bot API.
-- **Webhook Support**: Automatic webhook setup and processing of Telegram updates using the `telegram.ext.Application`.
+---
 
-## 💁‍♀️ How to install
+## ✨ Функционал
+- **FastAPI** 🚀 — быстрый API для обработки вебхуков Telegram.  
+- **MarkdownV2 → HTML** 🎨 — автоматическое преобразование текста перед отправкой.  
+- **Переносы строк (`|` → `
+`)** 📜 — Telegram корректно рендерит текст.  
+- **Случайные цитаты** 🎲 — команда `/random` выбирает случайный пост из базы.  
+- **Поддержка ссылок** 🔗 — `[Текст](https://example.com)` превращается в `<a href="URL">Текст</a>`.  
+- **Работает с базами данных** 🗃️ (PostgreSQL, Railway) **⚠️** *База данных не входит в репозиторий!*  
 
-- Create a new repository from this template: Click
-  the [Use this template](https://github.com/new?template_name=TelegramBot.Webhook&template_owner=dangos-dev) button on
-  this repository's main page (or clone the repository).
-- Install packages with pip using `pip install -r requirements.txt`
-- Run locally using `hypercorn main:app --reload`
+---
 
-## 🤖 Example
-Talk to [DangoBot - Telegram Webhooks](https://t.me/dango_webhook_bot) on Telegram
+## 💁‍♀️ Как установить?
+1️⃣ Клонируем репозиторий:
+```bash
+git clone https://github.com/ТВОЙ_РЕПОЗИТОРИЙ
+cd WuJiXingBot
+```
+2️⃣ Устанавливаем зависимости:
+```bash
+pip install -r requirements.txt
+```
+3️⃣ Запускаем локально:
+```bash
+hypercorn main:app --reload
+```
+
+---
+
+## 🤖 Команды
+| **Команда**  | **Описание**  |
+|-------------|-------------|
+| `/start`    | Запуск бота  |
+| `/help`     | Список команд  |
+| `/random`   | Получить случайную цитату  |
+| `/about`    | О боте и проекте  |
+
+---
+
+## **👤 Авторы**
+🔹 **Mongol.kun** — автор и разработчик WuJiXing.  
+🔹 **Gizmo (ChatGPT)** — соразработчик, кодер и технический ассистент.  
+
+---
