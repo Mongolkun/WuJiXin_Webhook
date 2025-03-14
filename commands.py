@@ -28,6 +28,7 @@ async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         rows = await conn.fetch(f"SELECT command, response FROM {HELP_TABLE}")
+    await pool.close()  # ✅ Закрываем соединение после работы с БД
     if rows:
         help_text = "\n".join([f"{row['command']}: {row['response']}" for row in rows])
         help_text = markdown_to_html(help_text)  # ✅ Конвертируем MarkdownV2 → HTML
@@ -40,6 +41,7 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         rows = await conn.fetch(f"SELECT topic, description FROM {INFO_TABLE}")
+    await pool.close()  # ✅ Закрываем соединение после работы с БД
     if rows:
         info_text = "\n".join([f"{row['topic']}: {row['description']}" for row in rows])
         info_text = markdown_to_html(info_text)  # ✅ Конвертируем MarkdownV2 → HTML
@@ -53,7 +55,7 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(f"SELECT content FROM posts WHERE lang = 'ru' ORDER BY RANDOM() LIMIT 1")
-
+    await pool.close()  # ✅ Закрываем соединение после работы с БД
     if row:
         text = markdown_to_html(row['content'])  # ✅ Конвертируем MarkdownV2 → HTML
         await update.message.reply_text(text, parse_mode="HTML")  # ✅ Telegram поймёт формат
