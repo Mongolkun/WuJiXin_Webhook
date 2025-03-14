@@ -8,7 +8,6 @@ from telegram.ext import Application
 from db import connect_db
 from commands import register_handlers
 import gc
-await bot_builder.bot.deleteWebhook()
 
 # Load environment variables
 load_dotenv()
@@ -24,9 +23,14 @@ bot_builder = (
 )
 
 @asynccontextmanager
+@asynccontextmanager
 async def lifespan(_: FastAPI):
-    """ Sets the webhook for the Telegram Bot and manages its lifecycle (start/stop). """
-    await bot_builder.bot.setWebhook(url=WEBHOOK_DOMAIN)
+    """ Управление Webhook'ом Telegram """
+    print("⚡ Сбрасываем старый Webhook...")
+    await bot_builder.bot.deleteWebhook()  # Удаляем старый Webhook
+    print("⚡ Устанавливаем новый Webhook...")
+    await bot_builder.bot.setWebhook(url=WEBHOOK_DOMAIN)  # Устанавливаем новый Webhook
+
     async with bot_builder:
         await bot_builder.start()
         yield
