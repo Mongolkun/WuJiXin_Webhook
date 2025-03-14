@@ -3,6 +3,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 from db import connect_db, HELP_TABLE, INFO_TABLE, POST_TABLE
 import os
 import re
+import gc
 
 def markdown_to_html(text):
     """Конвертирует MarkdownV2 в HTML перед отправкой в Telegram"""
@@ -29,6 +30,8 @@ async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with pool.acquire() as conn:
         rows = await conn.fetch(f"SELECT command, response FROM {HELP_TABLE}")
     await pool.close()  # ✅ Закрываем соединение после работы с БД
+    gc.collect()  # ✅ Принудительная очистка памяти
+    
     if rows:
         help_text = "\n".join([f"{row['command']}: {row['response']}" for row in rows])
         help_text = markdown_to_html(help_text)  # ✅ Конвертируем MarkdownV2 → HTML
@@ -42,12 +45,15 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with pool.acquire() as conn:
         rows = await conn.fetch(f"SELECT topic, description FROM {INFO_TABLE}")
     await pool.close()  # ✅ Закрываем соединение после работы с БД
+    gc.collect()  # ✅ Принудительная очистка памяти
+    
     if rows:
         info_text = "\n".join([f"{row['topic']}: {row['description']}" for row in rows])
         info_text = markdown_to_html(info_text)  # ✅ Конвертируем MarkdownV2 → HTML
         await update.message.reply_text(info_text, parse_mode="HTML")
     else:
         await update.message.reply_text("❌ В базе пока нет информации.")
+
 
 # Команда /random - получение случаного поста
 async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -56,6 +62,8 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     async with pool.acquire() as conn:
         row = await conn.fetchrow(f"SELECT content FROM posts WHERE lang = 'ru' ORDER BY RANDOM() LIMIT 1")
     await pool.close()  # ✅ Закрываем соединение после работы с БД
+    gc.collect()  # ✅ Принудительная очистка памяти
+    
     if row:
         text = markdown_to_html(row['content'])  # ✅ Конвертируем MarkdownV2 → HTML
         await update.message.reply_text(text, parse_mode="HTML")  # ✅ Telegram поймёт формат
