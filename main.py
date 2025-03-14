@@ -48,8 +48,12 @@ async def process_update(request: Request):
     await bot_builder.process_update(update)
     return Response(status_code=HTTPStatus.OK)
 
-# Команда /help - получение справки
+# Команда /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Приветствие при запуске бота"""
+    await update.message.reply_text("Привет! Это WuJiXing Telegram Bot 🚀")
 
+# Команда /help - получение справки
 async def send_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pool = await connect_db()
     async with pool.acquire() as conn:
