@@ -8,6 +8,7 @@ from telegram.ext import Application
 from db import connect_db
 from commands import register_handlers
 import gc
+from contextlib import asynccontextmanager
 
 # Load environment variables
 load_dotenv()
@@ -23,18 +24,17 @@ bot_builder = (
 )
 
 @asynccontextmanager
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    """ Управление Webhook'ом Telegram """
+async def lifespan(app: FastAPI):
+    """ Управление жизненным циклом Webhook'а Telegram """
     print("⚡ Сбрасываем старый Webhook...")
     await bot_builder.bot.deleteWebhook()  # Удаляем старый Webhook
     print("⚡ Устанавливаем новый Webhook...")
     await bot_builder.bot.setWebhook(url=WEBHOOK_DOMAIN)  # Устанавливаем новый Webhook
 
-    async with bot_builder:
-        await bot_builder.start()
-        yield
-        await bot_builder.stop()
+    yield  # ✅ Здесь должно быть yield, а не return
+
+    print("⚡ Завершаем работу бота...")
+    await bot_builder.stop()
 
 app = FastAPI(lifespan=lifespan)
 
