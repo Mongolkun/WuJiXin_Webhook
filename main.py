@@ -7,6 +7,8 @@ from telegram import Update
 from telegram.ext import Application
 from db import connect_db
 from commands import register_handlers
+import gc
+await bot_builder.bot.deleteWebhook()
 
 # Load environment variables
 load_dotenv()
