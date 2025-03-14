@@ -38,6 +38,7 @@ async def process_update(request: Request):
     message = await request.json()
     update = Update.de_json(data=message, bot=bot_builder.bot)
     await bot_builder.process_update(update)
+    gc.collect()  # ✅ Принудительная очистка памяти
     return Response(status_code=HTTPStatus.OK)
     
 register_handlers(bot_builder)  # Теперь передаём bot_builder
