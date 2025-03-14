@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandler, filters
-from db import connect_db
+from db import connect_db, HELP_TABLE, INFO_TABLE, POST_TABLE
 
 # Load environment variables
 load_dotenv()
