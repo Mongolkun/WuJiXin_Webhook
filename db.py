@@ -7,7 +7,7 @@ POST_TABLE = os.getenv("POST_TABLE", "post")
 
 async def connect_db():
     """ Подключение к PostgreSQL """
-    return await asyncpg.create_pool(os.getenv('DATABASE_URL')
+    return await asyncpg.create_pool(os.getenv('DATABASE_URL'))
 
 # Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
