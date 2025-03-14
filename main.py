@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from telegram import Update
 from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandler, filters
+from db import connect_db
 
 # Load environment variables
 load_dotenv()
@@ -26,8 +27,7 @@ bot_builder = (
 )
 
 # Подключение к PostgreSQL
-async def connect_db():
-    return await asyncpg.create_pool(os.getenv('DATABASE_URL'))
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
