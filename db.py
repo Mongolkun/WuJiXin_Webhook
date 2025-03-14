@@ -7,14 +7,7 @@ POST_TABLE = os.getenv("POST_TABLE", "post")
 
 async def connect_db():
     """ Подключение к PostgreSQL """
-    return await asyncpg.create_pool(os.getenv('DATABASE_URL'))
-@app.post("/")
-async def process_update(request: Request):
-    """ Handles incoming Telegram updates and processes them with the bot. """
-    message = await request.json()
-    update = Update.de_json(data=message, bot=bot_builder.bot)
-    await bot_builder.process_update(update)
-    return Response(status_code=HTTPStatus.OK)
+    return await asyncpg.create_pool(os.getenv('DATABASE_URL')
 
 # Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
