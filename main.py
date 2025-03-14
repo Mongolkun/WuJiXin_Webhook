@@ -27,14 +27,17 @@ bot_builder = (
 async def lifespan(app: FastAPI):
     """ Управление жизненным циклом Webhook'а Telegram """
     print("⚡ Сбрасываем старый Webhook...")
-    await bot_builder.bot.deleteWebhook()  # Удаляем старый Webhook
+    await bot_builder.bot.deleteWebhook()
     print("⚡ Устанавливаем новый Webhook...")
-    await bot_builder.bot.setWebhook(url=WEBHOOK_DOMAIN)  # Устанавливаем новый Webhook
+    await bot_builder.bot.setWebhook(url=WEBHOOK_DOMAIN)
 
-    yield  # ✅ Здесь должно быть yield, а не return
+    print("⚡ Инициализируем bot_builder...")
+    await bot_builder.initialize()  # ✅ Теперь bot_builder инициализирован
 
-    print("⚡ Завершаем работу бота...")
-    await bot_builder.stop()
+    async with bot_builder:
+        await bot_builder.start()
+        yield
+        await bot_builder.stop()
 
 app = FastAPI(lifespan=lifespan)
 
