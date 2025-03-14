@@ -52,7 +52,8 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("❌ В базе пока нет постов.")
         
-bot_builder.add_handler(CommandHandler("start", start))
-bot_builder.add_handler(CommandHandler("help", send_help))
-bot_builder.add_handler(CommandHandler("info", send_info))
-bot_builder.add_handler(CommandHandler("random", send_random_post))
+def register_handlers(bot_builder):
+    bot_builder.add_handler(CommandHandler("start", start))
+    bot_builder.add_handler(CommandHandler("help", send_help))
+    bot_builder.add_handler(CommandHandler("info", send_info))
+    bot_builder.add_handler(CommandHandler("random", send_random_post))
