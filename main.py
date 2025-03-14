@@ -12,11 +12,6 @@ from db import connect_db
 load_dotenv()
 TELEGRAM_BOT_TOKEN: str = os.getenv('TELEGRAM_BOT_TOKEN')
 WEBHOOK_DOMAIN: str = os.getenv('RAILWAY_PUBLIC_DOMAIN')
-HELP_TABLE = os.getenv("HELP_TABLE", "help")
-INFO_TABLE = os.getenv("INFO_TABLE", "info")
-POST_TABLE = os.getenv("POST_TABLE", "post")
-
-
 
 # Build the Telegram Bot application
 bot_builder = (
