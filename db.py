@@ -6,5 +6,5 @@ print("📡 Загружается db.py...")  # Проверяем, вызыв�
 async def connect_db():
     """ Подключение к PostgreSQL """
     print("📡 Подключаемся к базе данных...")  # Должно появиться в логах Railway
-    return await asyncpg.create_pool(os.getenv('DATABASE_URL'))
     print(f"📡 DATABASE_URL: {os.getenv('DATABASE_URL')}")
+    return await asyncpg.create_pool(os.getenv('DATABASE_URL'))
