@@ -35,3 +35,11 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+@app.post("/")
+async def process_update(request: Request):
+    """ Handles incoming Telegram updates and processes them with the bot. """
+    message = await request.json()
+    update = Update.de_json(data=message, bot=bot_builder.bot)
+    await bot_builder.process_update(update)
+    return Response(status_code=HTTPStatus.OK)
