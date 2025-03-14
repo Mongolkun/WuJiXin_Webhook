@@ -41,6 +41,4 @@ async def process_update(request: Request):
     await bot_builder.process_update(update)
     return Response(status_code=HTTPStatus.OK)
     
-# Регистрируем команды
-register_handlers(bot_builder)
-
+register_handlers(bot_builder)  # Теперь передаём bot_builder
