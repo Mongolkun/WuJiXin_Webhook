@@ -1,11 +1,10 @@
 import os
-import asyncpg
 from contextlib import asynccontextmanager
 from http import HTTPStatus
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, Response
 from telegram import Update
-from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandler, filters
+from telegram.ext import Application
 from db import connect_db
 from commands import register_handlers
 
