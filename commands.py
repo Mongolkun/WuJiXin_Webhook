@@ -117,6 +117,18 @@ async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👉 /info – Узнать больше о проекте WuJiXing",
         parse_mode="HTML"
     )
+
+async def unknown_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Автоответ, если пользователь пишет обычное сообщение"""
+    await update.message.reply_text(
+        "Путник, я пока не могу тебе отвечать. 🏯\n"
+        "Но ты можешь использовать команды:\n"
+        "👉 /start – Начать общение\n"
+        "👉 /help – Посмотреть список команд\n"
+        "👉 /random – Получить случайную мысль WuJiXing\n"
+        "👉 /info – Узнать больше о проекте WuJiXing",
+        parse_mode="HTML"
+    )
     
 def register_handlers(bot_builder):
     bot_builder.add_handler(CommandHandler("start", start))
@@ -124,3 +136,4 @@ def register_handlers(bot_builder):
     bot_builder.add_handler(CommandHandler("info", send_info))
     bot_builder.add_handler(CommandHandler("random", send_random_post))
     bot_builder.add_handler(MessageHandler(filters.COMMAND, unknown_command))
+    bot_builder.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown_message))
