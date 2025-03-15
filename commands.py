@@ -68,21 +68,32 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT content, category FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
-    
-    await pool.close()  # ✅ Закрываем соединение с БД
-    
-    if row:
-        content = markdown_to_html(row['content'])  # ✅ MarkdownV2 сам всё обработает
-        category = f"#{row['category']}" if row['category'].strip() else "❌ Категория не указана"
+        # Выбираем случайный пост
+        row = await conn.fetchrow(f"SELECT id, thread, position FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
 
-        # Добавляем стандартные хэштеги
-        final_text = f"{content}\n\n#WuJiXing {category}"
+        if not row:
+            await update.message.reply_text("❌ В базе пока нет постов.")
+            return
+        
+        thread_id = row["thread"]
+        post_id = row["id"]
 
-        # Отправляем сообщение
-        await update.message.reply_text(final_text, parse_mode="HTML")  # ✅ Telegram понимает HTML
-    else:
-        await update.message.reply_text("❌ В базе пока нет постов.")
+        if thread_id == 0:  # Одиночный пост
+            post = await conn.fetchrow(f"SELECT content, category FROM posts WHERE id = {post_id}")
+            content = markdown_to_html(post["content"])
+            category = post["category"]
+            final_text = f"{content}\n\n#WuJiXing #{category}"
+        
+        else:  # Пост в треде
+            posts = await conn.fetch(f"SELECT content, position, category FROM posts WHERE thread = {thread_id} ORDER BY position")
+            content_list = [markdown_to_html(post["content"]) for post in posts]
+            category = posts[-1]["category"]  # Берём категорию из последнего поста треда
+            final_text = "\n\n".join(content_list) + f"\n\n#WuJiXing #{category}"
+
+    await pool.close()
+    
+    # Отправляем сообщение
+    await update.message.reply_text(final_text, parse_mode="HTML")
         
 def register_handlers(bot_builder):
     bot_builder.add_handler(CommandHandler("start", start))
