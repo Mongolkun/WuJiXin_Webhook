@@ -57,16 +57,27 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Команда /random - получение случаного поста
 async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Выбираем случайный пост, форматируем и отправляем в Telegram"""
+    logging.info("📡 Вызвана команда /random")
     pool = await connect_db()
+    if not pool:
+        logging.error("❌ Ошибка: нет соединения с базой!")
+        await update.message.reply_text("❌ Ошибка: База данных недоступна!")
+        return
+    
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT content FROM posts WHERE lang = 'ru' ORDER BY RANDOM() LIMIT 1")
-    await pool.close()  # ✅ Закрываем соединение после работы с БД
-    gc.collect()  # ✅ Принудительная очистка памяти
+        row = await conn.fetchrow(f"SELECT content, category FROM {POST_TABLE} WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1")
+    
+    await pool.close()  # ✅ Закрываем соединение с БД
     
     if row:
-        text = markdown_to_html(row['content'])  # ✅ Конвертируем MarkdownV2 → HTML
-        await update.message.reply_text(text, parse_mode="HTML")  # ✅ Telegram поймёт формат
+        content = markdown_to_html(row['content'])  # ✅ MarkdownV2 сам всё обработает
+        category = row['category']
+
+        # Добавляем хэштеги
+        final_text = f"{content}\n\n#WuJiXing #{category}"
+
+        # Отправляем сообщение
+        await update.message.reply_text(final_text, parse_mode="HTML")  # ✅ Telegram понимает HTML
     else:
         await update.message.reply_text("❌ В базе пока нет постов.")
         
