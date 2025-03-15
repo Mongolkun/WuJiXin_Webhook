@@ -95,9 +95,6 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 
     await pool.close()
     
-    # Отправляем сообщение
-    await update.message.reply_text(final_text, parse_mode="HTML")
-        
 def register_handlers(bot_builder):
     bot_builder.add_handler(CommandHandler("start", start))
     bot_builder.add_handler(CommandHandler("help", send_help))
