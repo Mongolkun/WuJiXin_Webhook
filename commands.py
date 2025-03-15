@@ -4,6 +4,9 @@ from db import connect_db, HELP_TABLE, INFO_TABLE, POST_TABLE
 import os
 import re
 import gc
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 def markdown_to_html(text):
     """Конвертирует MarkdownV2 в HTML перед отправкой в Telegram"""
