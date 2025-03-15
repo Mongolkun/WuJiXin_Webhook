@@ -72,13 +72,13 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await pool.close()  # ✅ Закрываем соединение с БД
     
-    if row:
+     if row:
         content = markdown_to_html(row['content'])  # ✅ MarkdownV2 сам всё обработает
+        hashtags = row['hashtags'] if row['hashtags'] else "❌ Хэштегов нет"
         category = row['category']
 
         # Добавляем хэштеги
-        final_text = f"{content}\n\n#WuJiXing #{category}"
-
+        final_text = f"{content}\n\n#WuJiXing #{category}\n🔹 Хэштеги в базе: {hashtags}"
         # Отправляем сообщение
         await update.message.reply_text(final_text, parse_mode="HTML")  # ✅ Telegram понимает HTML
     else:
