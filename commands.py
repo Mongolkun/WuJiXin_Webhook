@@ -59,7 +59,7 @@ async def send_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # Команда /random - получение случаного поста
-async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def send_random_posts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("📡 Вызвана команда /random")
     pool = await connect_db()
     if not pool:
