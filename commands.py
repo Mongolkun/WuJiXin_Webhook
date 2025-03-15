@@ -103,11 +103,24 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 
                 if i < len(posts) - 1:  # Добавляем задержку перед следующими постами
                     await asyncio.sleep(1)
-
     await pool.close()
+
+#Обработчик неизвестных команд
+async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Автоответ, если команда не распознана"""
+    await update.message.reply_text(
+        "Путник, я пока не могу тебе ответить. 🚀\n"
+        "Но ты можешь использовать основные команды:\n"
+        "👉 /start – Начать общение\n"
+        "👉 /help – Посмотреть список команд\n"
+        "👉 /random – Получить случайную мысль WuJiXing\n"
+        "👉 /info – Узнать больше о проекте WuJiXing",
+        parse_mode="HTML"
+    )
     
 def register_handlers(bot_builder):
     bot_builder.add_handler(CommandHandler("start", start))
     bot_builder.add_handler(CommandHandler("help", send_help))
     bot_builder.add_handler(CommandHandler("info", send_info))
     bot_builder.add_handler(CommandHandler("random", send_random_post))
+    bot_builder.add_handler(MessageHandler(filters.COMMAND, unknown_command))
