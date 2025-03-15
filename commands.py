@@ -68,7 +68,7 @@ async def send_random_posts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT content, category FROM {POST_TABLE} WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1")
+        row = await conn.fetchrow(f"SELECT content, category FROM {POSTS_TABLE} WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1")
     
     await pool.close()  # ✅ Закрываем соединение с БД
     
