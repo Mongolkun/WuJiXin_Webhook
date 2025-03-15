@@ -5,6 +5,7 @@ import os
 import re
 import gc
 import logging
+import asyncio
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -68,7 +69,6 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     async with pool.acquire() as conn:
-        # Выбираем случайный пост с учётом языка
         row = await conn.fetchrow(f"SELECT id, thread, language, date FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
 
         if not row:
@@ -87,7 +87,7 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             category = post["category"]
             await update.message.reply_text(f"{content}\n\n#WuJiXing #{category}", parse_mode="HTML")
         
-        else:  # Пост в треде (добавляем ограничение по дате!)
+        else:  # Пост в треде с задержкой 1 секунда между сообщениями
             posts = await conn.fetch(f"""
                 SELECT content, position, category FROM posts 
                 WHERE thread = {thread_id} AND language = '{language}' AND date = '{post_date}'
@@ -100,6 +100,9 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if i == len(posts) - 1:  # Последний пост в треде
                     content += f"\n\n#WuJiXing #{category}"
                 await update.message.reply_text(content, parse_mode="HTML")
+                
+                if i < len(posts) - 1:  # Добавляем задержку перед следующими постами
+                    await asyncio.sleep(1)
 
     await pool.close()
     
