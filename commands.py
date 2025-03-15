@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from db import connect_db, HELP_TABLE, INFO_TABLE, POST_TABLE
 import os
 import re
