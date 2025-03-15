@@ -88,9 +88,9 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         category = posts[-1]["category"]  # Берём категорию из последнего поста
 
         for i, post in enumerate(posts):
-        content = markdown_to_html(post["content"])
+            content = markdown_to_html(post["content"])
         if i == len(posts) - 1:  # Последний пост в треде
-        content += f"\n\n#WuJiXing #{category}"
+            content += f"\n\n#WuJiXing #{category}"
         await update.message.reply_text(content, parse_mode="HTML")
                 
     await pool.close()
