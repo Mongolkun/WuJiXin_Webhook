@@ -68,17 +68,16 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT content, COALESCE(hashtags, '') AS hashtags, COALESCE(category, '') AS category FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
+        row = await conn.fetchrow(f"SELECT content, category FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
     
     await pool.close()  # ✅ Закрываем соединение с БД
     
     if row:
         content = markdown_to_html(row['content'])  # ✅ MarkdownV2 сам всё обработает
-        hashtags = " ".join([f"#{tag.strip()}" for tag in row['hashtags'].split(",")]) if row['hashtags'].strip() else "❌ Хэштегов нет"
         category = f"#{row['category']}" if row['category'].strip() else "❌ Категория не указана"
 
-        # Добавляем хэштеги
-        final_text = f"{content}\n\n#WuJiXing {category}\n🔹 Хэштеги в базе: {hashtags}"
+        # Добавляем стандартные хэштеги
+        final_text = f"{content}\n\n#WuJiXing {category}"
 
         # Отправляем сообщение
         await update.message.reply_text(final_text, parse_mode="HTML")  # ✅ Telegram понимает HTML
