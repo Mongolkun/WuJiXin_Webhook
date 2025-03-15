@@ -68,28 +68,31 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     async with pool.acquire() as conn:
-        # Выбираем случайный пост
-        row = await conn.fetchrow(f"SELECT id, thread, position FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
+        row = await conn.fetchrow(f"SELECT id, thread FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
 
-        if not row:
-            await update.message.reply_text("❌ В базе пока нет постов.")
-            return
+    if not row:
+        await update.message.reply_text("❌ В базе пока нет постов.")
+        return
         
         thread_id = row["thread"]
         post_id = row["id"]
 
-        if thread_id == 0:  # Одиночный пост
-            post = await conn.fetchrow(f"SELECT content, category FROM posts WHERE id = {post_id}")
-            content = markdown_to_html(post["content"])
-            category = post["category"]
-            final_text = f"{content}\n\n#WuJiXing #{category}"
+    if thread_id == 0:  # Одиночный пост
+        post = await conn.fetchrow(f"SELECT content, category FROM posts WHERE id = {post_id}")
+        content = markdown_to_html(post["content"])
+        category = post["category"]
+        await update.message.reply_text(f"{content}\n\n#WuJiXing #{category}", parse_mode="HTML")
         
-        else:  # Пост в треде
-            posts = await conn.fetch(f"SELECT content, position, category FROM posts WHERE thread = {thread_id} ORDER BY position")
-            content_list = [markdown_to_html(post["content"]) for post in posts]
-            category = posts[-1]["category"]  # Берём категорию из последнего поста треда
-            final_text = "\n\n".join(content_list) + f"\n\n#WuJiXing #{category}"
+    else:  # Пост в треде
+        posts = await conn.fetch(f"SELECT content, position, category FROM posts WHERE thread = {thread_id} ORDER BY position")
+        category = posts[-1]["category"]  # Берём категорию из последнего поста
 
+        for i, post in enumerate(posts):
+        content = markdown_to_html(post["content"])
+        if i == len(posts) - 1:  # Последний пост в треде
+        content += f"\n\n#WuJiXing #{category}"
+        await update.message.reply_text(content, parse_mode="HTML")
+                
     await pool.close()
     
     # Отправляем сообщение
