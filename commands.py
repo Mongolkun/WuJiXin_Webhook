@@ -69,7 +69,7 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     async with pool.acquire() as conn:
         # Выбираем случайный пост с учётом языка
-        row = await conn.fetchrow(f"SELECT id, thread, language FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
+        row = await conn.fetchrow(f"SELECT id, thread, language, date FROM posts WHERE language = 'ru' ORDER BY RANDOM() LIMIT 1") 
 
         if not row:
             logging.error("❌ Ошибка: SQL-запрос не вернул строку!")
@@ -79,6 +79,7 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
         post_id = row["id"]
         thread_id = row["thread"]
         language = row["language"]
+        post_date = row["date"]
 
         if thread_id == 0:  # Одиночный пост
             post = await conn.fetchrow(f"SELECT content, category FROM posts WHERE id = {post_id} AND language = '{language}'")
@@ -86,8 +87,12 @@ async def send_random_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
             category = post["category"]
             await update.message.reply_text(f"{content}\n\n#WuJiXing #{category}", parse_mode="HTML")
         
-        else:  # Пост в треде
-            posts = await conn.fetch(f"SELECT content, position, category FROM posts WHERE thread = {thread_id} AND language = '{language}' ORDER BY position")
+        else:  # Пост в треде (добавляем ограничение по дате!)
+            posts = await conn.fetch(f"""
+                SELECT content, position, category FROM posts 
+                WHERE thread = {thread_id} AND language = '{language}' AND date = '{post_date}'
+                ORDER BY position
+            """)
             category = posts[-1]["category"]  # Берём категорию из последнего поста
 
             for i, post in enumerate(posts):
